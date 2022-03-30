@@ -1,4 +1,4 @@
-# How to contribute to directory-command
+# How to contribute to hypergeojson
 
 ## Prerequisites:
 
@@ -59,14 +59,14 @@ We encourage:
 We will exclude you from interaction if you insult, demean, or harass anyone. In particular, we don't tolerate behavior that
 excludes people in socially marginalized groups.
 
-If you are unsure what behavior is welcome, the [code of conduct has clear guidelines](CONDUCT.md).
+If you are unsure what behavior is welcome, the [code of conduct has clear guidelines](CODE_OF_CONDUCT.md).
 
 Private harassment is also unacceptable. No matter who you are, if you feel you have been or are being harassed or made uncomfortable by a community member, please contact one of the project maintainers. Whether you're a regular contributor or a newcomer, we care about
 making this community a safe place for you and we've got your back.
 
 Likewise any spamming, trolling, flaming, baiting or other attention-stealing behavior is not welcome.
 
-### [Read the code of conduct for more information](CONDUCT.md)
+### [Read the code of conduct for more information](CODE_OF_CONDUCT.md)
 
 ## Communication
 
