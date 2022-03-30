@@ -55,7 +55,7 @@ const point = await geo.get('1')
 const stream = geo.quadkeyQuery('2')
 
 stream.on('data', (data) => {
-	console.log(data)
+  console.log(data)
 })
 ```
 
