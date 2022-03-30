@@ -16,7 +16,7 @@ If you're interested in collaborating on this geospatial hypercore project, feel
 
 **Prerequisites:**
 
-- HyperGeoJson requires a recent [node.js](https://nodejs.org) version and is tested so far on v16.14.0.
+- HyperGeoJson requires a recent [node.js](https://nodejs.org) version and lowest version tested so far is v14.19.0.
 - This package is released as [ESM, which may require configuration in your project](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c)
 
 **Install with npm:**
