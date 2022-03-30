@@ -37,7 +37,7 @@ const geo = new HyperGeoJson()
 // Put a feature in the database
 await geo.put({
   "type": "Feature",
-	"id": "1",
+  "id": "1",
   "properties": {},
   "geometry": {
     "type": "Point",
