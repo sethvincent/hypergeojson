@@ -1,0 +1,35 @@
+{
+  "name": "hypergeojson",
+  "version": "0.0.0",
+  "description": "share geojson over the hypercore protocol",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "lint": "standard",
+    "lintfix": "standard --fix",
+    "test": "uvu tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sethvincent/hypergeojson.git"
+  },
+  "keywords": [
+    "hypercore"
+  ],
+  "author": "sethvincent",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sethvincent/hypergeojson/issues"
+  },
+  "homepage": "https://github.com/sethvincent/hypergeojson#readme",
+  "dependencies": {
+    "@mapbox/tilebelt": "^1.0.2",
+    "desm": "^1.2.0",
+    "hyperbee": "^1.7.0",
+    "hypercore": "^10.0.0-alpha.32"
+  },
+  "devDependencies": {
+    "standard": "^16.0.4",
+    "uvu": "^0.5.3"
+  }
+}

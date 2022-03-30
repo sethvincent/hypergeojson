@@ -1,0 +1,28 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  test:
+    name: Node.js v${{ matrix.nodejs }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 3
+    strategy:
+      matrix:
+        nodejs: [14, 16, 17]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.nodejs }}
+
+    - name: Install
+      run: |
+        npm install
+    - name: Test
+      run: npm test
