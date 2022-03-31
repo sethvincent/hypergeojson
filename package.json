@@ -23,13 +23,17 @@
   },
   "homepage": "https://github.com/sethvincent/hypergeojson#readme",
   "dependencies": {
+    "@mapbox/tile-cover": "^3.0.2",
     "@mapbox/tilebelt": "^1.0.2",
+    "@turf/bbox-polygon": "^6.5.0",
     "desm": "^1.2.0",
     "hyperbee": "^1.7.0",
-    "hypercore": "^10.0.0-alpha.32"
+    "hypercore": "^10.0.0-alpha.32",
+    "multistream": "^4.1.0"
   },
   "devDependencies": {
-    "standard": "^16.0.4",
+    "random-access-memory": "^4.0.0",
+    "standard": "^17.0.0-2",
     "uvu": "^0.5.3"
   }
 }
