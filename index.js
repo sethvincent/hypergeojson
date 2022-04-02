@@ -6,12 +6,11 @@ import bboxPolygon from '@turf/bbox-polygon'
 import MultiStream from 'multistream'
 
 /**
- *
+ * @param {object} [core] - hypercore instance https://github.com/hypercore-protocol/hypercore
  */
 export class HyperGeoJson {
-  constructor (core, options = {}) {
+  constructor (core) {
     this.core = core || new Hypercore('./hypergeojson')
-    this.options = options
 
     this.db = new HyperBee(this.core, {
       keyEncoding: 'utf-8',
@@ -23,6 +22,10 @@ export class HyperGeoJson {
     return this.core.ready()
   }
 
+  /**
+   * @param {import('@types/geojson').Feature} feature - geojson feature. Only points are allowed for now.
+   * @return {Promise<string>} quadkey
+   */
   async put (feature) {
     if (!feature.id) {
       throw new Error('feature must have an id')
@@ -31,7 +34,6 @@ export class HyperGeoJson {
     if (feature.geometry.type === 'Point') {
       const [lng, lat] = feature.geometry.coordinates
       const quadkey = pointToQuadkey(lng, lat)
-      feature.quadkey = quadkey
 
       await this.db.put(`features/${feature.id}`, feature)
 
@@ -39,11 +41,17 @@ export class HyperGeoJson {
       // and then "hydrate" the feature using the feature id on queries?
       await this.db.put(`types/${feature.type}`, feature)
       await this.db.put(`quadkeys/${quadkey}`, feature)
+
+      return quadkey
     } else {
       throw new Error(`put not implemented for geojson type ${feature.type}`)
     }
   }
 
+  /**
+   * @param {string} featureId
+   * @return {import('@types/geojson').Feature}
+   */
   async get (featureId) {
     return this.db.get(`features/${featureId}`)
   }
@@ -56,53 +64,77 @@ export class HyperGeoJson {
     return this.db.createReadStream(options)
   }
 
-  queryQuadkey (quadkey = '') {
-    return this.db.createReadStream({ gte: `quadkeys/${quadkey}`, lt: `quadkeys/${quadkey}~` })
-  }
-
-  queryBbox (bbox, options = {}) {
-    const {
-      minZoom: min_zoom,
-      maxZoom: max_zoom
-    } = options
-
-    const geojson = bboxPolygon(bbox)
-    const quadkeys = cover.indexes(geojson.geometry, {
-      min_zoom,
-      max_zoom
-    })
-
+  /**
+   * @param {Array<string>} quadkeys
+   * @param {object} [options] - passed to hyperbee createReadStream https://github.com/hypercore-protocol/hyperbee#stream--dbcreatereadstreamoptions
+   * @return {stream.Readable<import('@types/geojson').Feature>}
+   */
+  quadKeysToStream (quadkeys, options = {}) {
     // convert quadkey array into array of streams
     const streams = quadkeys.map((quadkey) => {
-      return this.queryQuadkey(quadkey)
+      return this.queryQuadkey(quadkey, options)
     })
-
+  
     // returns stream of features
     return MultiStream.obj(streams)
   }
 
-  queryGeojsonType (geojsonType) {
-    return this.db.createReadStream({ gte: `types/${geojsonType}`, lt: `types/${geojsonType}~` })
+  /**
+   * @param {string} quadkey - string containing numerical id of a specific tile https://wiki.openstreetmap.org/wiki/QuadTiles
+   * @param {object} [options] - passed to hyperbee createReadStream https://github.com/hypercore-protocol/hyperbee#stream--dbcreatereadstreamoptions
+   * @return {stream.Readable<import('@types/geojson').Feature>}
+   */
+  queryQuadkey (quadkey = '', options = {}) {
+    options.gte = `quadkeys/${quadkey}`
+    options.lt = `quadkeys/${quadkey}~`
+    return this.db.createReadStream(options)
+  }
+
+  /**
+   * @param {string} geojsonType
+   * @param {object} [options] - passed to hyperbee createReadStream https://github.com/hypercore-protocol/hyperbee#stream--dbcreatereadstreamoptions
+   * @return {stream.Readable<import('@types/geojson').Feature>}
+   */
+  queryGeojsonType (geojsonType, options = {}) {
+    options.gte = `types/${geojsonType}`
+    options.lt = `types/${geojsonType}~`
+    return this.db.createReadStream(options)
+  }
+
+  /**
+   * @param {import('@types/geojson').BBox} bbox
+   * @param {object} [options] - passed to hyperbee createReadStream https://github.com/hypercore-protocol/hyperbee#stream--dbcreatereadstreamoptions
+   * @param {object} [options.zoomLimits]
+   * @param {number} [options.zoomLimits.minZoom]
+   * @param {number} [options.zoomLimits.maxZoom]
+   * @return {stream.Readable<import('@types/geojson').Feature>}
+   */
+  queryBbox (bbox, options = {}) {
+    const quadkeys = bboxToQuadkeys(bbox, options)
+    return this.quadKeysToStream(quadkeys, options)
   }
 
   /**
    * query features using quadkey, bbox, or geojson type
-   * @returns {stream.Readable}
+   * @param {object} [query]
+   * @param {string} [query.quadkey]
+   * @param {string} [query.geojsonType]
+   * @param {import('@types/geojson').BBox} [query.bbox]
+   * @param {object} [options.zoomLimits] - used with the bbox query
+   * @param {number} [options.zoomLimits.minZoom]
+   * @param {number} [options.zoomLimits.maxZoom]
+   * @param {object} [options]
+   * @return {stream.Readable<import('@types/geojson').Feature>}
    */
-  query (options = {}) {
-    const {
-      quadkey,
-      bbox,
-      bboxLimits,
-      geojsonType
-    } = options
+  query (query = {}, options = {}) {
+    const { quadkey, bbox, geojsonType } = query
 
     if (quadkey) {
-      return this.queryQuadkey(quadkey)
+      return this.queryQuadkey(quadkey, options)
     } else if (bbox) {
-      return this.queryBbox(bbox, bboxLimits)
+      return this.queryBbox(bbox, options)
     } else if (geojsonType) {
-      return this.queryGeojsonType(geojsonType)
+      return this.queryGeojsonType(geojsonType, options)
     }
   }
 }
@@ -110,6 +142,16 @@ export class HyperGeoJson {
 export function bboxToQuadkey (bbox) {
   const tile = bboxToTile(bbox)
   return tileToQuadkey(tile)
+}
+
+export function bboxToQuadkeys (bbox, options = {}) {
+  const { zoomLimits } = options
+  const geojson = bboxPolygon(bbox)
+
+  return cover.indexes(geojson.geometry, {
+    min_zoom: zoomLimits.minZoom,
+    max_zoom: zoomLimits.maxZoom
+  })
 }
 
 export function pointToQuadkey (lng, lat, zoom = 24) {

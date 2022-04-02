@@ -68,9 +68,11 @@ test('query points with bbox', async () => {
 
 	// this starts to get really slow at maxZoom above 12
   const stream = geo.queryBbox(bbox, {
-    minZoom: 11,
-    maxZoom: 12
-  })
+		zoomLimits: {
+			minZoom: 11,
+			maxZoom: 12
+		}
+	})
 
   const results = []
 
