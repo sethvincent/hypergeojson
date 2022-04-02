@@ -31,7 +31,7 @@ test('get a point', async () => {
 })
 
 test('query points with quadkey', async () => {
-  const stream = geo.queryQuadkey('02')
+  const stream = geo.query({ quadkey: '02' })
   const results = []
 
   stream.on('data', (data) => {
@@ -47,7 +47,7 @@ test('query points with quadkey', async () => {
 })
 
 test('query point with exact quadkey', async () => {
-  const stream = geo.queryQuadkey('021230023223323011200000')
+  const stream = geo.query({ quadkey: '021230023223323011200000' })
 
   const results = []
 
@@ -67,7 +67,7 @@ test('query points with bbox', async () => {
   const bbox = [-130.781250,43.068888,-110.390625,55.578345]
 
 	// this starts to get really slow at maxZoom above 12
-  const stream = geo.queryBbox(bbox, {
+  const stream = geo.query({ bbox }, {
 		zoomLimits: {
 			minZoom: 11,
 			maxZoom: 12

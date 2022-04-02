@@ -57,7 +57,7 @@ const point = await geo.get('1')
 Query features with a quadkey
 
 ```js
-const stream = geo.quadkeyQuery('02123')
+const stream = geo.query({ quadkey: '02123' })
 ```
 
 Query features with a bbox
@@ -65,7 +65,7 @@ Query features with a bbox
 ```js
 const bbox = [-130.781250,43.068888,-110.390625,55.578345]
 
-const stream = geo.queryBbox(bbox, {
+const stream = geo.query({ bbox }, {
   zoomLimits: {
   	minZoom: 11,
   	maxZoom: 12
