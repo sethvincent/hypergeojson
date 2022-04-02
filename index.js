@@ -74,7 +74,7 @@ export class HyperGeoJson {
     const streams = quadkeys.map((quadkey) => {
       return this.queryQuadkey(quadkey, options)
     })
-  
+
     // returns stream of features
     return MultiStream.obj(streams)
   }

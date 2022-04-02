@@ -64,15 +64,15 @@ test('query point with exact quadkey', async () => {
 })
 
 test('query points with bbox', async () => {
-  const bbox = [-130.781250,43.068888,-110.390625,55.578345]
+  const bbox = [-130.781250, 43.068888, -110.390625, 55.578345]
 
-	// this starts to get really slow at maxZoom above 12
+  // this starts to get really slow at maxZoom above 12
   const stream = geo.query({ bbox }, {
-		zoomLimits: {
-			minZoom: 11,
-			maxZoom: 12
-		}
-	})
+    zoomLimits: {
+      minZoom: 11,
+      maxZoom: 12
+    }
+  })
 
   const results = []
 
