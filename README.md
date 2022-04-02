@@ -42,20 +42,34 @@ await geo.put({
   "geometry": {
     "type": "Point",
     "coordinates": [
-      -77.0361328125,
-      -11.996338401936226
+      -122.89993286132812,
+      47.04720076526227
     ]
   }
 })
 
 // Get a feature by its id
 const point = await geo.get('1')
+```
 
-// Query points with a quadkey (this is an extremely high-level quadkey)
-const stream = geo.quadkeyQuery('2')
+### Querying the data
 
-stream.on('data', (data) => {
-  console.log(data)
+Query features with a quadkey
+
+```js
+const stream = geo.quadkeyQuery('02123')
+```
+
+Query features with a bbox
+
+```js
+const bbox = [-130.781250,43.068888,-110.390625,55.578345]
+
+const stream = geo.queryBbox(bbox, {
+  zoomLimits: {
+  	minZoom: 11,
+  	maxZoom: 12
+  }
 })
 ```
 
