@@ -15,7 +15,7 @@ const points = JSON.parse(pointsFile)
 
 const core = new Hypercore(ram)
 
-const geo = new HyperGeoJson(core)
+const geo = new HyperGeoJson({ core })
 
 await geo.ready()
 
