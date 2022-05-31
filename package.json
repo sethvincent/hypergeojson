@@ -30,6 +30,9 @@
     "desm": "^1.2.0",
     "hyperbee": "^1.7.0",
     "hypercore": "^10.0.0-alpha.32",
+    "hyperswarm": "^3.0.4",
+    "mdns-sd-discovery": "github:digidem/mdns-sd-discovery",
+    "mri": "^1.2.0",
     "multistream": "^4.1.0"
   },
   "devDependencies": {

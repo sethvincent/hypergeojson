@@ -9,8 +9,9 @@ import MultiStream from 'multistream'
  * @param {object} [core] - hypercore instance https://github.com/hypercore-protocol/hypercore
  */
 export class HyperGeoJson {
-  constructor (core) {
-    this.core = core || new Hypercore('./hypergeojson')
+  constructor (filepath, options = {}) {
+    const { key } = options
+    this.core = new Hypercore(filepath, key)
 
     this.db = new HyperBee(this.core, {
       keyEncoding: 'utf-8',
@@ -20,6 +21,10 @@ export class HyperGeoJson {
 
   async ready () {
     return this.core.ready()
+  }
+
+  replicate (isInitiator, options) {
+    return this.core.replicate(isInitiator, options)
   }
 
   /**
