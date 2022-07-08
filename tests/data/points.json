@@ -1,61 +1,61 @@
 {
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "id": "0",
-      "properties": {
-        "name": "Olympia"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -122.89993286132812,
-          47.04720076526227
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "1",
-      "properties": {
-        "name": "Tokyo"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -220.2370834350586,
-          35.68267720876588
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "2",
-      "properties": {
-        "name": "Buenos Aires"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -58.43593597412109,
-          -34.60551942876607
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "id": "3",
-      "properties": {
-        "name": "Wellington"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -185.22382736206055,
-          -41.28838417684591
-        ]
-      }
-    }
-  ]
+	"type": "FeatureCollection",
+	"features": [
+		{
+			"type": "Feature",
+			"id": "0",
+			"properties": {
+				"name": "Olympia"
+			},
+			"geometry": {
+				"type": "Point",
+				"coordinates": [
+					-122.89993286132812,
+					47.04720076526227
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "1",
+			"properties": {
+				"name": "Tokyo"
+			},
+			"geometry": {
+				"type": "Point",
+				"coordinates": [
+					-220.2370834350586,
+					35.68267720876588
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "2",
+			"properties": {
+				"name": "Buenos Aires"
+			},
+			"geometry": {
+				"type": "Point",
+				"coordinates": [
+					-58.43593597412109,
+					-34.60551942876607
+				]
+			}
+		},
+		{
+			"type": "Feature",
+			"id": "3",
+			"properties": {
+				"name": "Wellington"
+			},
+			"geometry": {
+				"type": "Point",
+				"coordinates": [
+					-185.22382736206055,
+					-41.28838417684591
+				]
+			}
+		}
+	]
 }

@@ -3,20 +3,20 @@ import * as path from 'path'
 
 import mri from 'mri'
 
-import { HyperGeoJson } from '../index.js'
 import { Discovery } from '../discovery.js'
+import { HyperGeoJson } from '../index.js'
 
 const argv = process.argv.slice(2)
 
 const flags = mri(argv, {
-  alias: {
-    key: ['k'],
-    filepath: ['f']
-  },
-  boolean: [],
-  default: {
-    filepath: path.join(process.cwd(), '.hypergeojson')
-  }
+	alias: {
+		key: ['k'],
+		filepath: ['f']
+	},
+	boolean: [],
+	default: {
+		filepath: path.join(process.cwd(), '.hypergeojson')
+	}
 })
 
 const args = flags._
@@ -31,52 +31,51 @@ await geo.ready()
 const publicKey = geo.core.key.toString('hex')
 
 const discovery = new Discovery({
-  topic: publicKey,
-  server,
-  client
+	server,
+	client
 })
 
 discovery.on('peer', (connection) => {
-  connection.pipe(geo.replicate(!server)).pipe(connection)
+	connection.pipe(geo.replicate(!server)).pipe(connection)
 })
 
-async function share () {
-  console.log('key', publicKey)
-  console.log(`node bin/index.js share --key ${publicKey}`)
-  await discovery.join(publicKey)
+async function sync () {
+	console.log('key', publicKey)
+	console.log(`node bin/index.js sync --key ${publicKey}`)
+	await discovery.join(publicKey)
 }
 
 async function put () {
-  if (!server) {
-    return console.error('not writable, must be owner of project to write data')
-  }
+	if (!server) {
+		return console.error('not writable, must be owner of project to write data')
+	}
 
-  const featuresFilepath = args[0]
-  const data = await fs.readFile(featuresFilepath)
-  const geojson = JSON.parse(data)
+	const featuresFilepath = args[0]
+	const data = await fs.readFile(featuresFilepath)
+	const geojson = JSON.parse(data)
 
-  for (const feature of geojson.features) {
-    await geo.put(feature)
-  }
+	for (const feature of geojson.features) {
+		await geo.put(feature)
+	}
 
-  process.exit()
+	process.exit()
 }
 
 async function list () {
-  if (!server) {
-    await discovery.join(publicKey)
-  }
+	if (!server) {
+		await discovery.join(publicKey)
+	}
 
-  await geo.core.update()
-  for await (const data of geo.createReadStream({ live: true })) {
-    console.log(data)
-  }
+	await geo.core.update()
+	for await (const data of geo.createReadStream({ live: true })) {
+		console.log(data)
+	}
 }
 
-if (cmd === 'share') {
-  await share()
+if (cmd === 'sync') {
+	await sync()
 } else if (cmd === 'put') {
-  await put()
+	await put()
 } else if (cmd === 'list') {
-  await list()
+	await list()
 }

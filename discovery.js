@@ -1,74 +1,125 @@
 import { EventEmitter } from 'events'
 import net from 'net'
 
+import NoiseSecretStream from '@hyperswarm/secret-stream'
 import Hyperswarm from 'hyperswarm'
 import { MdnsDiscovery } from 'mdns-sd-discovery'
+import z32 from 'z32'
 
 export class Discovery extends EventEmitter {
-  constructor (options) {
-    super()
+	#connections = new Set()
 
-    const { topic, server, client } = options
+	constructor (options) {
+		super()
 
-    this.topic = topic
-    this.server = server
-    this.client = client
-    this.swarm = new Hyperswarm({ server, client })
-    this.mdns = new MdnsDiscovery()
-    this.tcp = net.createServer()
-    this.socket = undefined
+		const { server, client, bootstrap, name } = options
 
-    this.tcp.listen(() => {
-      this.address = this.tcp.address()
-    })
+		this.name = name
+		this.server = server
+		this.client = client
+		this.swarm = new Hyperswarm({ server, client, bootstrap })
+		this.mdns = new MdnsDiscovery()
+		this.tcp = net.createServer()
+		this.socket = undefined
 
-    this.swarm.on('connection', (connection, info) => {
-      this.emit('peer', connection, info)
-    })
+		this.tcp.listen(() => {
+			this.address = this.tcp.address()
+		})
 
-    this.mdns.on('service', (service) => {
-      const socket = net.connect({
-        host: service.host,
-        port: service.port,
-        allowHalfOpen: true
-      })
+		this.swarm.on('connection', (connection, info) => {
+			this.emit('peer', connection, info)
+		})
 
-      this.emit('peer', socket)
-      this.socket = socket
-    })
+		this.mdns.on('service', (service) => {
+			if (service.txt.name === this.name) {
+				return
+			}
 
-    this.tcp.on('connection', (socket) => {
-      this.emit('peer', socket)
-    })
-  }
+			const socket = net.connect({
+				host: service.host,
+				port: service.port,
+				allowHalfOpen: true
+			})
 
-  async join (topic, options = {}) {
-    this.dht = this.swarm.join(Buffer.from(topic, 'hex'), {
-      server: this.server,
-      client: this.client
-    })
+			const connection = new NoiseSecretStream(true, socket)
+			connection.on('connect', () => {
+				this.emit('peer', connection)
+			})
 
-    if (this.server) {
-      await this.dht.flushed()
-      const { port } = this.address
-      this.mdns.announce('hypergeojson', { port, txt: { topic } })
-    } else {
-      await this.swarm.flush()
-    }
+			connection.on('error', (error) => {
+				console.error(error)
+				connection.end()
+			})
 
-    this.mdns.lookup('hypergeojson')
-  }
+			connection.on('close', () => {
+				connection.end()
+			})
 
-  async leave (topic) {
-    await this.swarm.leave(topic)
-    this.mdns.unannounce()
-    this.mdns.stopLookup()
-  }
+			this.#connections.add(connection)
+		})
 
-  destroy () {
-    this.removeAllListeners('peer')
-    this.dht.destroy()
-    this.swarm.destroy()
-    this.mdns.destroy()
-  }
+		this.tcp.on('connection', (socket) => {
+			const connection = new NoiseSecretStream(false, socket)
+
+			connection.on('error', (error) => {
+				console.error(error)
+				connection.end()
+			})
+
+			connection.on('close', () => {
+				connection.end()
+			})
+
+			this.emit('peer', connection)
+			this.#connections.add(connection)
+		})
+	}
+
+	async join (topic, options = {}) {
+		this.dht = this.swarm.join(Buffer.from(topic, 'hex'), {
+			server: this.server,
+			client: this.client
+		})
+
+		await this.swarm.flush()
+		await this.dht.flushed()
+
+		if (this.server) {
+			await this.dht.flushed()
+			const { port } = this.address
+			this.mdns.announce({
+				name: '_hypergeo',
+				protocol: '_tcp',
+				subtypes: [z32.encode(topic)]
+			}, { port, txt: { topic, name: this.name } })
+		} else {
+			await this.swarm.flush()
+			this.mdns.lookup({
+				name: '_hypergeo',
+				protocol: '_tcp',
+				subtypes: [z32.encode(topic)]
+			})
+		}
+	}
+
+	async leave (topic) {
+		await this.swarm.leave(topic)
+		this.mdns.unannounce()
+		this.mdns.stopLookup()
+	}
+
+	async destroy () {
+		this.removeAllListeners('peer')
+		await this.dht.destroy()
+		await this.swarm.destroy()
+		this.mdns.stopLookup()
+		this.mdns.unannounce(true)
+		this.mdns.destroy()
+
+		for (const connection of this.#connections.values()) {
+			connection.end()
+		}
+
+		this.tcp.close()
+	}
 }

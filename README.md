@@ -36,16 +36,16 @@ const geo = new HyperGeoJson()
 
 // Put a feature in the database
 await geo.put({
-  "type": "Feature",
-  "id": "1",
-  "properties": {},
-  "geometry": {
-    "type": "Point",
-    "coordinates": [
-      -122.89993286132812,
-      47.04720076526227
-    ]
-  }
+	'type': 'Feature',
+	'id': '1',
+	'properties': {},
+	'geometry': {
+		'type': 'Point',
+		'coordinates': [
+			-122.89993286132812,
+			47.04720076526227
+		]
+	}
 })
 
 // Get a feature by its id
@@ -63,13 +63,13 @@ const stream = geo.query({ quadkey: '02123' })
 Query features with a bbox
 
 ```js
-const bbox = [-130.781250,43.068888,-110.390625,55.578345]
+const bbox = [-130.781250, 43.068888, -110.390625, 55.578345]
 
 const stream = geo.query({ bbox }, {
-  zoomLimits: {
-  	minZoom: 11,
-  	maxZoom: 12
-  }
+	zoomLimits: {
+		minZoom: 11,
+		maxZoom: 12
+	}
 })
 ```
 
@@ -86,8 +86,10 @@ It's important that this project contributes to a friendly, safe, and welcoming 
 Read about the changes to this project in [CHANGELOG.md](CHANGELOG.md). The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Contact
+
 - [issues](https://github.com/sethvincent/hypergeojson/issues)
 - [email](hi@sethvincent.com)
 
 ## License
+
 [ISC](LICENSE.md)
