@@ -108,6 +108,20 @@ test('query points with bbox', async (t) => {
 	})
 })
 
+test('query all points', async (t) => {
+	t.plan(1)
+	const stream = geo.query({ geojsonType: 'point' })
+	const results = []
+
+	stream.on('data', (data) => {
+		results.push(data)
+	})
+
+	stream.on('end', () => {
+		t.ok(results.length === points.features.length)
+	})
+})
+
 test('discovery', async (t) => {
 	t.plan(1)
 	const testnet = await createTestnet(10)

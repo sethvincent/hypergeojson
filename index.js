@@ -49,8 +49,8 @@ export class HyperGeoJson {
 
 			// TODO: should these two indexes just store the feature id?
 			// and then "hydrate" the feature using the feature id on queries?
-			await this.db.put(`types/${feature.type}`, feature)
-			await this.db.put(`quadkeys/${quadkey}`, feature)
+			await this.db.put(`types/${feature.geometry.type.toLowerCase()}/${feature.id}`, feature)
+			await this.db.put(`quadkeys/${quadkey}/${feature.id}`, feature)
 
 			return quadkey
 		} else {
@@ -106,8 +106,8 @@ export class HyperGeoJson {
 	 * @return {stream.Readable<import('@types/geojson').Feature>}
 	 */
 	queryGeojsonType (geojsonType, options = {}) {
-		options.gte = `types/${geojsonType}`
-		options.lt = `types/${geojsonType}~`
+		options.gte = `types/${geojsonType.toLowerCase()}`
+		options.lt = `types/${geojsonType.toLowerCase()}~`
 		return this.db.createReadStream(options)
 	}
 
